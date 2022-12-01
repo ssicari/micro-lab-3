@@ -7,15 +7,16 @@ DS3231 clock;
 RTCDateTime dt;
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
-#define ENABLE 5
-#define DIR1 3
-#define DIR2 4
+#define ENABLE 3
+#define DIR1 22
+#define DIR2 23
+#define BUTTON 2
 uint8_t fan_speeds[] = {255, 180, 128, 50, 0};
 
 bool motor_dir1 = HIGH
 bool motor_dir2 = LOW
 
-attachInterrupt(digitalPinToInterrupt(2), buttonISR, RISING)
+attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, RISING)
 
 void setup() 
 {
