@@ -2,7 +2,7 @@
 #define ENABLE 5
 #define DIR1 3
 #define DIR2 4
-int fan_speeds[] = {255, 180, 128, 50, 0};
+uint8_t fan_speeds[] = {255, 180, 128, 50, 0};
 
 void setup() 
 {
