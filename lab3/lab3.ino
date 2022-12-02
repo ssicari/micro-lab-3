@@ -3,34 +3,39 @@
 #include <DS3231.h>
 #include <LiquidCrystal.h>
 
-DS3231 clock;
-RTCDateTime dt;
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-
 #define ENABLE 3
 #define DIR1 22
 #define DIR2 23
 #define BUTTON 2
+
+//DS3231 clock;
+//RTCDateTime dt;
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
 uint8_t fan_speeds[] = {255, 180, 128, 50, 0};
 int speed_index = 0;
 
 bool motor_dir1 = HIGH;
 bool motor_dir2 = LOW;
 
+double debounce = 0;
+static double debounce_time = 10;
+bool buttonpress = LOW;
+
 void setup() 
 {
   pinMode(ENABLE, OUTPUT);
   pinMode(DIR1, OUTPUT);
   pinMode(DIR2, OUTPUT);
-  serial.begin(9600);
+  Serial.begin(9600);
   //lcd.begin(9600);
 
-  clock.begin();
-  clock.setDateTime(__DATE__, __TIME__);
+  //clock.begin();
+  //clock.setDateTime(__DATE__, __TIME__);
 
   lcd.begin(16, 2);
 
-  attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, CHANGE);
   cli();//stop interrupts
 
   //set timer1 interrupt at 1Hz
@@ -51,7 +56,7 @@ void setup()
   sei(); //allow interrupts
 }
 
-void motorcontrol(byte speed, bool D1, bool D2)
+void motor_control(byte speed, bool D1, bool D2)
 {
   analogWrite(ENABLE, speed);
   digitalWrite(DIR1, D1); //start fan spinning in one direction
@@ -60,8 +65,7 @@ void motorcontrol(byte speed, bool D1, bool D2)
 
 void loop() 
 {
-
-  motor_control(fan_speeds[i], motor_dir1, motor_dir2);
+  motor_control(fan_speeds[speed_index], motor_dir1, motor_dir2);
   //analogWrite(ENABLE, fan_speeds[i]);
   //digitalWrite(DIR1, HIGH); //start fan spinning in one direction
   //digitalWrite(DIR2, LOW);
@@ -71,24 +75,48 @@ void loop()
       digitalWrite(DIR1, LOW); //change fan direction
       digitalWrite(DIR2, HIGH);
     }
-  delay(1000);*/
-  }
+   */
 
   }
 
-void buttonISR() {
+void buttonProcess()
+{
+  long curTime = millis();
   motor_dir1 = !motor_dir1;
   motor_dir2 = !motor_dir2;
 }
-void ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
-  lcd.setCursor(0, 1);
-  dt = clock.getDateTime();
-  lcd.print(dt.year);   lcd.print("-");
-  lcd.print(dt.month);  lcd.print("-");
-  lcd.print(dt.day);    lcd.print(" ");
-  lcd.print(dt.hour);   lcd.print(":");
-  lcd.print(dt.minute); lcd.print(":");
-  lcd.print(dt.second); lcd.println("");
-  speed_index = (speed_index + 1)%5;
+
+void buttonISR() {
+  if(buttonpress == LOW){
+    buttonpress = HIGH;
+    debounce = millis();
+  }
+  else if (buttonpress == HIGH){
+    if (millis()-debounce>debounce_time){
+      motor_dir1 = !motor_dir1;
+      motor_dir2 = !motor_dir2;
+    }
+    buttonpress = LOW;
+
+  }
+
 }
+
+ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
+  lcd.clear();
+  lcd.noAutoscroll();
+  lcd.setCursor(0, 0);
+  //dt = clock.getDateTime();
+
+  lcd.setCursor(0, 1);
+  if(motor_dir1)
+  {
+    lcd.print("D: CCW S:" + speed_index);
+  }
+  else
+  {
+    lcd.print("D: CW  S:" + speed_index);
+  }
+    
+  speed_index = (speed_index + 1)%5;
 }
