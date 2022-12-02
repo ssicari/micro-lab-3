@@ -1,6 +1,6 @@
 //code modified from Elegoo website
 #include <Wire.h>
-#include <DS3231.h>
+#include "RTClib.h"
 #include <LiquidCrystal.h>
 
 #define ENABLE 3
@@ -8,8 +8,7 @@
 #define DIR2 23
 #define BUTTON 2
 
-//DS3231 clock;
-//RTCDateTime dt;
+RTC_DS1307 rtc;
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 uint8_t fan_speeds[] = {255, 180, 128, 50, 0};
@@ -27,8 +26,9 @@ void setup()
   pinMode(ENABLE, OUTPUT);
   pinMode(DIR1, OUTPUT);
   pinMode(DIR2, OUTPUT);
-  Serial.begin(9600);
-  //lcd.begin(9600);
+  Wire.begin();
+  rtc.begin();
+
 
   //clock.begin();
   //clock.setDateTime(__DATE__, __TIME__);
@@ -106,7 +106,7 @@ ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
   lcd.clear();
   lcd.noAutoscroll();
   lcd.setCursor(0, 0);
-  //dt = clock.getDateTime();
+  DateTime time = rtc.now();
 
   lcd.setCursor(0, 1);
   if(motor_dir1)
@@ -117,6 +117,11 @@ ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
   {
     lcd.print("D: CW  S:" + speed_index);
   }
+
+  lcd.setCursor(0, 0);
+  lcd.print(time.hour()); lcd.print(":");
+  lcd.print(time.minute()); lcd.print(":");
+  lcd.print(time.second()); lcd.print(":");
     
   speed_index = (speed_index + 1)%5;
 }
