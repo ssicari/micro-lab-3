@@ -65,25 +65,7 @@ void motor_control(byte speed, bool D1, bool D2)
 
 void loop() 
 {
-  motor_control(fan_speeds[speed_index], motor_dir1, motor_dir2);
-  //analogWrite(ENABLE, fan_speeds[i]);
-  //digitalWrite(DIR1, HIGH); //start fan spinning in one direction
-  //digitalWrite(DIR2, LOW);
-  
-  /*if(//button is pressed)
-    {
-      digitalWrite(DIR1, LOW); //change fan direction
-      digitalWrite(DIR2, HIGH);
-    }
-   */
 
-  }
-
-void buttonProcess()
-{
-  long curTime = millis();
-  motor_dir1 = !motor_dir1;
-  motor_dir2 = !motor_dir2;
 }
 
 void buttonISR() {
@@ -103,6 +85,7 @@ void buttonISR() {
 }
 
 ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
+  motor_control(fan_speeds[speed_index], motor_dir1, motor_dir2);
   lcd.clear();
   lcd.noAutoscroll();
   lcd.setCursor(0, 0);
