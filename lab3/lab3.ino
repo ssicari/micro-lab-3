@@ -12,9 +12,10 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 #define DIR2 23
 #define BUTTON 2
 uint8_t fan_speeds[] = {255, 180, 128, 50, 0};
+int speed_index = 0;
 
-bool motor_dir1 = HIGH
-bool motor_dir2 = LOW
+bool motor_dir1 = HIGH;
+bool motor_dir2 = LOW;
 
 void setup() 
 {
@@ -59,34 +60,19 @@ void motorcontrol(byte speed, bool D1, bool D2)
 
 void loop() 
 {
-  lcd.setCursor(0, 1);
-  dt = clock.getDateTime();
 
-  while(1) //infinite loop to keep fan running
-  {
-    for(int i = 0; i < 5; i++) //iterate through all 5 speeds (full, 3/4, 1/2. 1/4, off)
+  motor_control(fan_speeds[i], motor_dir1, motor_dir2)
+  //analogWrite(ENABLE, fan_speeds[i]);
+  //digitalWrite(DIR1, HIGH); //start fan spinning in one direction
+  //digitalWrite(DIR2, LOW);
+  
+  /*if(//button is pressed)
     {
-      //digitalWrite(ENABLE, HIGH);
-
-      lcd.print(dt.year);   lcd.print("-");
-      lcd.print(dt.month);  lcd.print("-");
-      lcd.print(dt.day);    lcd.print(" ");
-      lcd.print(dt.hour);   lcd.print(":");
-      lcd.print(dt.minute); lcd.print(":");
-      lcd.print(dt.second); lcd.println("");
-
-      motor_control(fan_speeds[i], motor_dir1, motor_dir2)
-      //analogWrite(ENABLE, fan_speeds[i]);
-      //digitalWrite(DIR1, HIGH); //start fan spinning in one direction
-      //digitalWrite(DIR2, LOW);
-      
-      /*if(//button is pressed)
-        {
-          digitalWrite(DIR1, LOW); //change fan direction
-          digitalWrite(DIR2, HIGH);
-        }
-      delay(1000);*/
+      digitalWrite(DIR1, LOW); //change fan direction
+      digitalWrite(DIR2, HIGH);
     }
+  delay(1000);*/
+  }
 
   }
 
@@ -95,6 +81,14 @@ void buttonISR() {
   motor_dir2 = !motor_dir2
 }
 void ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
-  secondsPassed++;
+  lcd.setCursor(0, 1);
+  dt = clock.getDateTime();
+  lcd.print(dt.year);   lcd.print("-");
+  lcd.print(dt.month);  lcd.print("-");
+  lcd.print(dt.day);    lcd.print(" ");
+  lcd.print(dt.hour);   lcd.print(":");
+  lcd.print(dt.minute); lcd.print(":");
+  lcd.print(dt.second); lcd.println("");
+  speed_index = (speed_index + 1)%5
 }
 }
