@@ -65,6 +65,7 @@ void motor_control(byte speed, bool D1, bool D2)
 
 void loop() 
 {
+  motor_control(fan_speeds[speed_index], motor_dir1, motor_dir2);
 
 }
 
@@ -85,7 +86,6 @@ void buttonISR() {
 }
 
 ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
-  motor_control(fan_speeds[speed_index], motor_dir1, motor_dir2);
   lcd.clear();
   lcd.noAutoscroll();
   lcd.setCursor(0, 0);
