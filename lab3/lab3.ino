@@ -30,7 +30,7 @@ void setup()
 
   lcd.begin(16, 2);
 
-  attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, RISING)
+  attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, RISING);
   cli();//stop interrupts
 
   //set timer1 interrupt at 1Hz
@@ -61,7 +61,7 @@ void motorcontrol(byte speed, bool D1, bool D2)
 void loop() 
 {
 
-  motor_control(fan_speeds[i], motor_dir1, motor_dir2)
+  motor_control(fan_speeds[i], motor_dir1, motor_dir2);
   //analogWrite(ENABLE, fan_speeds[i]);
   //digitalWrite(DIR1, HIGH); //start fan spinning in one direction
   //digitalWrite(DIR2, LOW);
@@ -77,8 +77,8 @@ void loop()
   }
 
 void buttonISR() {
-  motor_dir1 = !motor_dir1
-  motor_dir2 = !motor_dir2
+  motor_dir1 = !motor_dir1;
+  motor_dir2 = !motor_dir2;
 }
 void ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
   lcd.setCursor(0, 1);
@@ -89,6 +89,6 @@ void ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
   lcd.print(dt.hour);   lcd.print(":");
   lcd.print(dt.minute); lcd.print(":");
   lcd.print(dt.second); lcd.println("");
-  speed_index = (speed_index + 1)%5
+  speed_index = (speed_index + 1)%5;
 }
 }
